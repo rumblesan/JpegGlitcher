@@ -3,72 +3,76 @@ import java.awt.Toolkit;
 
 class GlitchJpeg {
  
- String filename;
- 
- int data[];
+ int normalData[];
  int glitchData[];
- 
- ArrayList huffman;
- ArrayList quantize;
- ArrayList scan;
- 
+
  Image jpegImage;
  
  GlitchJpeg() {
  }
  
  void readImage(String inputFile) {
-   filename = inputFile;
-   byte binData[] = loadBytes(filename);
-   convertBytesToInts(binData);
-   glitchData = new int[data.length];
+   byte[] inputData = loadBytes(inputFile);
+   normalData = convertBytesToInts(inputData);
  }
  
  void saveImage(String outputFile) {
-   saveBytes(outputFile, convertIntsToBytes());
+   saveBytes(outputFile, convertIntsToBytes(glitchData));
  }
- 
- Image getImage() {
-   jpegImage = Toolkit.getDefaultToolkit().createImage(convertIntsToBytes());
-   while (jpegImage.getHeight(null) == -1)
-   {
-     delay(25); // Don't hog CPU!
-   }
-   return jpegImage;
- }
- 
- void convertBytesToInts (byte binData[]) {
-   data = new int[binData.length];
-   for( int i = 0; i < binData.length; i++) {
-     data[i] = binData[i] & 0xff;
-   }
- }
- 
- byte[] convertIntsToBytes() {
-   byte[] output = new byte[glitchData.length];
-   for( int i = 0; i < glitchData.length; i++) {
-     output[i] = byte(glitchData[i]);
+
+ int[] convertBytesToInts (byte[] input) {
+   int[] output = new int[input.length];
+   for( int i = 0; i < input.length; i++) {
+     output[i] = input[i] & 0xff;
    }
    return output;
  }
  
- void glitchImage(float chance, int offset) {
-   int val;
-   for( int i = 0; i < data.length; i++) {
-     val = data[i];
-     if ( ((random(1000)/10) < chance) && (i > offset) ) {
-         val = int(random(256));
-     }
-     glitchData[i] = val;
+ byte[] convertIntsToBytes(int[] input) {
+   byte[] output = new byte[input.length];
+   for( int i = 0; i < input.length; i++) {
+     output[i] = byte(input[i]);
    }
- }
- 
- void parseData() {
-   int cval, nval;
-   for( int i = 0; i < data.length; i++) {
-     
-   }
+   return output;
  }
   
+ Image getNormalImage() {
+   byte[] imgData = convertIntsToBytes(normalData);
+   return getImage(imgData);
+ }
+ 
+  
+ Image getGlitchImage() {
+   byte[] imgData = convertIntsToBytes(glitchData);
+   return getImage(imgData);
+ }
+ 
+ Image getImage(byte[] imgData) {
+   jpegImage = Toolkit.getDefaultToolkit().createImage(imgData);
+   while (jpegImage.getHeight(null) == -1)
+   {
+     delay(25);
+   }
+   return jpegImage;
+ }
+ 
+ 
+ void glitchImage(float chance, int offset) {
+     glitchData = glitch(normalData, chance, offset);
+ }
+ 
+ int[] glitch(int[] input, float chance, int offset) {
+   int[] output = new int[input.length];
+   for( int i = 0; i < input.length; i++) {
+     if ( ((random(1000)/10) < chance) && (i > offset) ) {
+         output[i] = int(random(256));
+     } else {
+         output[i] = input[i];
+     }
+   }
+   return output;
+ }
+ 
+
 }
 

@@ -8,15 +8,17 @@ void setup() {
   glitch = new GlitchJpeg();
   glitch.readImage(imgFile);
 
-  jpegImage = new PImage(glitch.getImage());
+  
 }
 
 
 void draw() {
-  background(200);
+
 }
 
 void mouseClicked() {
-  //glitch.glitchImage(1, 200);
+  background(200);
+  glitch.glitchImage(1, 200);
+  jpegImage = new PImage(glitch.getGlitchImage());
   image(jpegImage, 0, 0);
 }
